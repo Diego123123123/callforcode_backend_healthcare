@@ -1,5 +1,6 @@
 package org.callforcode.healthcare;
 
+import org.callforcode.healthcare.filters.JWTRequestFilter;
 import org.callforcode.healthcare.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,13 +9,17 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     private final UserService userService;
+    
+    private JWTRequestFilter jwtRequestFilter;
     
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -22,8 +27,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    public SecurityConfiguration(UserService userService) {
+    public SecurityConfiguration(UserService userService, JWTRequestFilter jwtRequestFilter) {
         this.userService = userService;
+        this.jwtRequestFilter = jwtRequestFilter;
     }
     
     
@@ -37,7 +43,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 antMatchers("/authenticate", "/register").
                 permitAll().
                 anyRequest().
-                authenticated();
+                authenticated().
+                and().
+                sessionManagement().
+                sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
     
     @Override

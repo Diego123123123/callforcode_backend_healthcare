@@ -1,6 +1,8 @@
 package org.callforcode.healthcare.services;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.callforcode.healthcare.entities.User;
 import org.callforcode.healthcare.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,10 @@ public class UserService implements IUserService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+    }
+    
+    public User findUserById(final Long id) {
+        return repository.findById(id).get();
     }
 
 }
