@@ -53,5 +53,9 @@ public class UserService implements IUserService {
     public User findUserById(final Long id) {
         return repository.findById(id).get();
     }
+    
+    public User findUserByEmail(final String email) {
+        return repository.findUserByEmail(email);
+    }
 
 }
